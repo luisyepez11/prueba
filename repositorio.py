@@ -1,0 +1,137 @@
+from archivo import Archivo
+from commit import Commit
+from rama import Rama
+
+class Repositorio:
+    # Constructor de la clase Repositorio
+    def __init__(self):
+        # Crea la rama principal "main" sin un commit anterior
+        master = Rama("main", None)
+        # Diccionario para almacenar las ramas del repositorio
+        self.ramas = {"main": master}
+        # Inicializa el contador de commits
+        self.id_commit = 0
+        # Almacena el commit más reciente
+        self.commit_resiente = None
+        # Establece la rama actual como "main"
+        self.rama_actual = "main"
+    
+    # Método para crear una nueva rama
+    def crear_rama(self, nombre):
+        bandera=0
+        for i in self.ramas:
+            if nombre == i:
+                print("ya hay una rama llamda asi")
+                bandera=1
+        if bandera==0:   
+          # Crea una nueva instancia de Rama
+          rama = Rama(nombre, self.commit_resiente)
+          # Agrega la nueva rama al diccionario de ramas
+          self.ramas[nombre] = rama
+          print(f"Se creó nueva rama {nombre}")
+
+    # Método para cambiar la rama actual
+    def cambiar_rama(self, nombre):
+        bandera=0
+        for i in self.ramas:
+            if nombre == i:
+                print(f"La rama {nombre} fue cambiada correctamente")
+                self.rama_actual = nombre
+                self.commit_resiente = self.ramas[self.rama_actual].commit_reciente
+                bandera=1
+        if bandera==0:
+            print(f"La rama {nombre} no existe")
+         
+    # Método para hacer un commit
+    def hacer_un_commit(self, texto):
+        # Convierte el texto en una lista de caracteres
+        comando = [i for i in texto]
+        # Cuenta la cantidad de puntos en el texto
+        cantidad = comando.count(".")
+        # Divide el texto en palabras
+        comando = texto.split(" ")
+        lista_de_archivo = []
+        bandera = 0
+        mensaje = input("git commit -m ")
+        print(cantidad)
+        # Verifica si se ingresó un nombre de archivo
+        if cantidad < 0:
+            print("No se ingresó el nombre del archivo")
+        else:
+            # Agrega cada archivo a la lista de archivos
+            for i in comando:
+                lista_de_archivo.append(Archivo(i, "contenido"))
+        print(lista_de_archivo)
+        # Crea un nuevo commit y lo asigna a la rama actual
+        self.commit_resiente = Commit(self.id_commit, lista_de_archivo, self.commit_resiente, mensaje)
+        self.ramas[self.rama_actual].commit_reciente = self.commit_resiente
+        # Incrementa el contador de commits
+        self.id_commit += 1
+
+    # Método para mostrar el historial de commits
+    def historial_commit(self):
+        print()
+        commit = self.ramas[self.rama_actual].commit_reciente
+        print(f"Rama {self.rama_actual}")
+        print()
+        # Recorre la cadena de commits hacia atrás
+        while commit != None:
+            print(f"{commit.mensaje} id = {commit.id}")
+            commit = commit.commit_anterior
+        print()
+
+    # Método para unir dos ramas
+    def unir(self, nombre):
+        bandera = 0
+        contador = -1
+        commit_principal = self.ramas[self.rama_actual].commit_reciente
+        commit_secundario = self.ramas[nombre].commit_reciente
+        acomodador = []
+        while bandera == 0:
+            contador += 1
+            if contador != 0:
+                commit_principal = commit_principal.commit_anterior
+
+            commit_secundario = self.ramas[nombre].commit_reciente
+
+            # Compara los commits de ambas ramas
+            while commit_secundario != None:
+                print(f"{commit_principal.mensaje} == {commit_secundario.mensaje} {commit_principal.id == commit_secundario.id}")
+                if commit_principal.id == commit_secundario.id:
+                    bandera = 1
+                commit_secundario = commit_secundario.commit_anterior
+        if contador!=0:
+            print(contador)
+            commit_principal = self.ramas[self.rama_actual].commit_reciente
+            commit_secundario = self.ramas[nombre].commit_reciente
+            # Agrega los commits de la rama principal al acomodador
+            for i in range(contador):
+                print(commit_principal.mensaje)
+                acomodador.append(commit_principal)
+                commit_principal = commit_principal.commit_anterior
+            acomodador.reverse()
+            # Une los commits de ambas ramas
+            acomodador[0].commit_anterior = commit_secundario
+            for i in range(contador - 1):
+                acomodador[i + 1].commit_anterior = acomodador[i]
+            # Actualiza el commit más reciente de la rama actual
+            self.ramas[self.rama_actual].commit_reciente = acomodador[len(acomodador) - 1]
+            # agrega un commit que referencia al merge
+            self.id_commit+=1
+            self.ramas[self.rama_actual].commit_reciente = Commit(self.id_commit,self.ramas[self.rama_actual].commit_reciente.lista,self.ramas[self.rama_actual].commit_reciente,"Merge")
+        else:
+            commit_secundario = self.ramas[nombre].commit_reciente
+            self.ramas[self.rama_actual].commit_reciente=commit_secundario
+
+
+                         
+                         
+                
+
+               
+               
+                   
+                   
+
+
+            
