@@ -15,31 +15,40 @@ class Repositorio:
         self.commit_resiente = None
         # Establece la rama actual como "main"
         self.rama_actual = "main"
+        print("Fue creada la rama main")
     
     # Método para crear una nueva rama
     def crear_rama(self, nombre):
-        bandera=0
-        for i in self.ramas:
-            if nombre == i:
-                print("ya hay una rama llamda asi")
-                bandera=1
-        if bandera==0:   
-          # Crea una nueva instancia de Rama
-          rama = Rama(nombre, self.commit_resiente)
-          # Agrega la nueva rama al diccionario de ramas
-          self.ramas[nombre] = rama
-          print(f"Se creó nueva rama {nombre}")
+        #Comprobar que no sea una cadena vacia el
+        if nombre=="":
+            print("No ingresó ningún nombre")
+        else:
+            bandera=0
+            for i in self.ramas:
+                if nombre == i:
+                    print("Ya hay una rama llamada así")
+                    bandera=1
+            if bandera==0:   
+                # Crea una nueva instancia de Rama
+                rama = Rama(nombre, self.commit_resiente)
+                # Agrega la nueva rama al diccionario de ramas
+                self.ramas[nombre] = rama
+                print()
+                print(f"Se creó una nueva rama {nombre}")
+                
 
     # Método para cambiar la rama actual
     def cambiar_rama(self, nombre):
         bandera=0
         for i in self.ramas:
             if nombre == i:
+                print()
                 print(f"La rama {nombre} fue cambiada correctamente")
                 self.rama_actual = nombre
                 self.commit_resiente = self.ramas[self.rama_actual].commit_reciente
                 bandera=1
         if bandera==0:
+            print()
             print(f"La rama {nombre} no existe")
          
     # Método para hacer un commit
@@ -52,32 +61,36 @@ class Repositorio:
         comando = texto.split(" ")
         lista_de_archivo = []
         bandera = 0
-        mensaje = input("git commit -m ")
+        print("Ingrese un comentario")
         print(cantidad)
         # Verifica si se ingresó un nombre de archivo
-        if cantidad < 0:
+        if cantidad == 0:
             print("No se ingresó el nombre del archivo")
         else:
+            mensaje = input("git commit -m ")
             # Agrega cada archivo a la lista de archivos
             for i in comando:
-                lista_de_archivo.append(Archivo(i, "contenido"))
-        print(lista_de_archivo)
-        # Crea un nuevo commit y lo asigna a la rama actual
-        self.commit_resiente = Commit(self.id_commit, lista_de_archivo, self.commit_resiente, mensaje)
-        self.ramas[self.rama_actual].commit_reciente = self.commit_resiente
-        # Incrementa el contador de commits
-        self.id_commit += 1
+                lista_de_archivo.append(Archivo(i, "Contenido"))
+            print(lista_de_archivo)
+            # Crea un nuevo commit y lo asigna a la rama actual
+            self.commit_resiente = Commit(self.id_commit, lista_de_archivo, self.commit_resiente, mensaje)
+            self.ramas[self.rama_actual].commit_reciente = self.commit_resiente
+            # Incrementa el contador de commits
+            self.id_commit += 1
+            print("Se realizó  correctamente el commit")
 
     # Método para mostrar el historial de commits
     def historial_commit(self):
         print()
         commit = self.ramas[self.rama_actual].commit_reciente
-        print(f"Rama {self.rama_actual}")
+        print(f"Head -> {self.rama_actual}")
         print()
-        # Recorre la cadena de commits hacia atrás
+        # Recorre la cadena de commits hacia atrás para imprimir el historial 
         while commit != None:
-            print(f"{commit.mensaje} id = {commit.id}")
+            print(f"commit id ={commit.id}")
+            print(f"{commit.mensaje}")
             commit = commit.commit_anterior
+            print()
         print()
 
     # Método para unir dos ramas
@@ -116,12 +129,14 @@ class Repositorio:
                 acomodador[i + 1].commit_anterior = acomodador[i]
             # Actualiza el commit más reciente de la rama actual
             self.ramas[self.rama_actual].commit_reciente = acomodador[len(acomodador) - 1]
-            # agrega un commit que referencia al merge
+            # Agrega un commit que referencia al merge
             self.id_commit+=1
             self.ramas[self.rama_actual].commit_reciente = Commit(self.id_commit,self.ramas[self.rama_actual].commit_reciente.lista,self.ramas[self.rama_actual].commit_reciente,"Merge")
         else:
             commit_secundario = self.ramas[nombre].commit_reciente
             self.ramas[self.rama_actual].commit_reciente=commit_secundario
+            # Establece el nuevo commit de la ramma fucionada 
+            self.commit_resiente=commit_secundario
 
 
                          
