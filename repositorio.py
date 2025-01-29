@@ -15,11 +15,13 @@ class Repositorio:
         self.commit_resiente = None
         # Establece la rama actual como "main"
         self.rama_actual = "main"
+        print("Precione Enter")
+        input("git init")
         print("Fue creada la rama main")
     
     # Método para crear una nueva rama
     def crear_rama(self, nombre):
-        #Comprobar que no sea una cadena vacia el
+        #Comprobar que no sea una cadena vacia 
         if nombre=="":
             print("No ingresó ningún nombre")
         else:
